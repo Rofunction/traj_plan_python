@@ -94,7 +94,7 @@ def quat_angle_diff_and_axi(q1, q2):
 def Slerp_orientation(radian, q1, q2, t):
     # 接近0°, slerp退化为线性插值
     if radian - 0 < 1e-2:
-        q = (1 - t) * q1 + (i * t) * q2
+        q = (1 - t) * q1 + t * q2
         q_norm = np.linalg.norm(q)
         q = q / q_norm
     else:
