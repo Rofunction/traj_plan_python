@@ -1,5 +1,6 @@
 import base
 import numpy as np
+import matplotlib.pyplot as plt
 
 def test_orien_plan(ori_rpy1, ori_rpy2, ori_rpy_3):
     quat1 = base.RPY2quat(ori_rpy1)
@@ -52,3 +53,7 @@ def test_orien_plan(ori_rpy1, ori_rpy2, ori_rpy_3):
     for i in range(1, steps_2 - 1):
         angle_vel2[i] = (angle2[i + 1] - angle2[i - 1]) / (2 * dt)
     angle_vel2[steps_2 - 1] = (angle2[steps_2 - 1] - angle2[steps_2 - 2]) / dt
+
+
+    # plot
+    fig = plt.figure()

@@ -65,7 +65,7 @@ def quat_angle_diff_and_axi(q1, q2):
     # 这里求出的theta是四元数空间的夹角，要转到三维空间时需要乘以2
     if len(q1) != 4 or len(q2) != 4:
         raise ValueError("Both q1 and q2 must be of length 4")
-    q1.np.array(q1)
+    q1 = np.array(q1)
     q2 = np.array(q2)
     dot_product = np.dot(q1, q2)
     # 确保从q1->q2的旋转角度是最短的
