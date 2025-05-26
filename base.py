@@ -67,22 +67,15 @@ def quat_angle_diff_and_axi(q1, q2, init_axi):
         raise ValueError("Both q1 and q2 must be of length 4")
     q1 = np.array(q1)
     q2 = np.array(q2)
-    cosV = np.dot(q1, q2)
-    # 确保从q1->q2的旋转角度是最短的
-    if cosV < 0:
-        q1 = -q1
-        cosV = -cosV
-    cosV = np.clip(cosV, 0.0, 1.0)  # Ensure the value is within the valid range for arccos
-    radian = np.arccos(cosV) # radian \in [0, pi/2]
-    if np.abs(radian) < 1e-6:
-        return 0, init_axi  # 如果两个四元数相同，返回0弧度和初始旋转轴
-    
     # 计算旋转轴v delta_q = q1^(-1) * q2 
     # q1^(-1) = [-x, -y, -z, w]
     # 这里的q1是单位四元数，所以q1^(-1) = q1的共轭
     q1_conjugate = np.array([-q1[0], -q1[1], -q1[2], q1[3]])
-    q = new_quat(q1_conjugate, q2)
-    v = normalize(q[:3])
+    delta_q = new_quat(q1_conjugate, q2)
+    v = normalize(delta_q[:3])
+    radian = np.arccos(delta_q[3])
+    if np.abs(radian) < 1e-6:
+        return 0, init_axi  # 如果两个四元数相同，返回0弧度和初始旋转轴
     return radian, v
 
 # 计算初始2个四元数之间夹角和旋转轴

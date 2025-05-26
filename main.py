@@ -10,4 +10,4 @@ if __name__ == "__main__":
     q1 = np.array([-.495, -.297, -.774, .258])
     q2 = np.array([-.828, -.315, -.177, .429])
     q3 = np.array([.490, -.487, .511, .511])
-    orien_plan.test_orien_plan(q1, q2, q3)
+    orien_plan.test_orien_plan_slerp(q1, q2, q3)

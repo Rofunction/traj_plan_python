@@ -2,7 +2,7 @@ import base
 import numpy as np
 import matplotlib.pyplot as plt
 
-def test_orien_plan(ori_rpy1, ori_rpy2, ori_rpy3):
+def test_orien_plan_slerp(ori_rpy1, ori_rpy2, ori_rpy3):
     # quat1 = base.RPY2quat(ori_rpy1)
     # quat2 = base.RPY2quat(ori_rpy2)
     # quat3 = base.RPY2quat(ori_rpy_3)
@@ -46,7 +46,7 @@ def test_orien_plan(ori_rpy1, ori_rpy2, ori_rpy3):
     for i in range(1, steps_1 + 1):
         t = i * dt * coef1
         q1_2[i] = base.Slerp_orientation(angle_diff1, quat1_new, quat2, t)
-        angle1[i], v1[i] = base.quat_angle_diff_and_axi(quat1, q1_2[i], v01) # 理论上初始轴只是用于第一次
+        angle1[i], v1[i] = base.quat_angle_diff_and_axi(quat1_new, q1_2[i], v01) # 理论上初始轴只是用于第一次
 
     # 计算角速度
     for i in range(1, steps_1):
@@ -58,7 +58,7 @@ def test_orien_plan(ori_rpy1, ori_rpy2, ori_rpy3):
     for i in range(1, steps_2 + 1):
         t = i * dt * coef2
         q2_3[i] = base.Slerp_orientation(angle_diff2, quat2_new, quat3, t)
-        angle2[i], v2[i] = base.quat_angle_diff_and_axi(quat2, q2_3[i], v02) # 理论上初始轴只是用于第一次
+        angle2[i], v2[i] = base.quat_angle_diff_and_axi(quat2_new, q2_3[i], v02) # 理论上初始轴只是用于第一次
 
     # 计算角速度
     for i in range(1, steps_2):
