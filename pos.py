@@ -13,9 +13,9 @@ def pos_interpolation():
     input.max_acceleration = [12.5]
     input.max_jerk = [25]
 
-    P1 = np.array([0.0, 0.0, 0.5])
-    P2 = np.array([0.0, 0.0, 0.8])
-    P3 = np.array([0.0, 0.0, 0.4])
+    P1 = np.array([0.2, 0.3, 0.5])
+    P2 = np.array([1.0, 0.1, 0.8])
+    P3 = np.array([0.6, 0.0, 0.4])
     
     dis_P2_P1 = base.cal_dis(P1, P2)
     dis_P3_P2 = base.cal_dis(P3, P2)
@@ -131,11 +131,11 @@ def pos_interpolation():
     # 笛卡尔图
     fig, axs = plt.subplots(3, 1, figsize=(10, 10), sharex=True)
     t1 = np.arange(traj_nums_1) * 0.004
-    t2 = np.arange(traj_nums_2) * 0.004 + t1[idx_rl]
+    t2 = np.arange(traj_nums_2) * 0.004 + t1[idx_rl - idx_rl2]
     t3 = np.arange(traj_nums_1 + idx_2) * 0.004
     len3 = len(t3)
     axs[0].plot(t1, pos_1[:, 0], label='traj_1_x')
-    axs[0].plot(t2, pos_2[idx_rl2:traj_nums_2, 0] , label='traj_2_x')
+    axs[0].plot(t2, pos_2[:, 0] , label='traj_2_x')
     axs[0].plot(t3, pos_3[0:len3, 0], label='traj_3_x')
     axs[0].scatter(idx_rl * 0.004, pos_1[idx_rl, 0], c='r', marker='o', label='pos')
     axs[0].set_ylabel('pos')
@@ -143,7 +143,7 @@ def pos_interpolation():
     axs[0].legend()
 
     axs[1].plot(t1, vel_1[:, 0], label='vel1_x')
-    axs[1].plot(t2, vel_2[idx_rl2:traj_nums_2, 0], label='vel2_x')
+    axs[1].plot(t2, vel_2[:, 0], label='vel2_x')
     axs[1].plot(t3, vel_3[0:len3, 0], label='vel3_x')
     axs[1].scatter(idx_rl * 0.004, vel_1[idx_rl, 0], c='r', marker='o', label='pos')
     axs[1].set_ylabel('vel')
@@ -151,7 +151,7 @@ def pos_interpolation():
     axs[1].legend()
 
     axs[2].plot(t1, acc_1[:, 0], label='acc1')
-    axs[2].plot(t2, acc_2[idx_rl2:traj_nums_2, 0], label='acc2')
+    axs[2].plot(t2, acc_2[:, 0], label='acc2')
     axs[2].plot(t3, acc_3[0:len3, 0], label='acc3')
     axs[2].scatter(idx_rl * 0.004, acc_1[idx_rl, 0], c='r', marker='o', label='pos')
     axs[2].set_ylabel('acc')
@@ -163,7 +163,7 @@ def pos_interpolation():
     # y 方向对比
     fig, axs = plt.subplots(3, 1, figsize=(10, 10), sharex=True)
     axs[0].plot(t1, pos_1[:, 1], label='traj_1_y')
-    axs[0].plot(t2, pos_2[idx_rl2:traj_nums_2, 1] , label='traj_2_y')
+    axs[0].plot(t2, pos_2[:, 1] , label='traj_2_y')
     axs[0].plot(t3, pos_3[0:len3, 1], label='traj_3_y')
     axs[0].scatter(idx_rl * 0.004, pos_1[idx_rl, 1], c='r', marker='o', label='pos')
     axs[0].set_ylabel('pos')
@@ -171,7 +171,7 @@ def pos_interpolation():
     axs[0].legend()
 
     axs[1].plot(t1, vel_1[:, 1], label='vel1_y')
-    axs[1].plot(t2, vel_2[idx_rl2:traj_nums_2, 1], label='vel2_y')
+    axs[1].plot(t2, vel_2[:, 1], label='vel2_y')
     axs[1].plot(t3, vel_3[0:len3, 1], label='vel3_y')
     axs[1].scatter(idx_rl * 0.004, vel_1[idx_rl, 1], c='r', marker='o', label='pos')
     axs[1].set_ylabel('vel')
@@ -179,7 +179,7 @@ def pos_interpolation():
     axs[1].legend()
 
     axs[2].plot(t1, acc_1[:, 1], label='acc1')
-    axs[2].plot(t2, acc_2[idx_rl2:traj_nums_2, 1], label='acc2')
+    axs[2].plot(t2, acc_2[:, 1], label='acc2')
     axs[2].plot(t3, acc_3[0:len3, 1], label='acc3')
     axs[2].scatter(idx_rl * 0.004, acc_1[idx_rl, 1], c='r', marker='o', label='pos')
     axs[2].set_ylabel('acc')
@@ -191,7 +191,7 @@ def pos_interpolation():
     # Z方向对比
     fig, axs = plt.subplots(3, 1, figsize=(10, 10), sharex=True)
     axs[0].plot(t1, pos_1[:, 2], label='traj_1_z')
-    axs[0].plot(t2, pos_2[idx_rl2:traj_nums_2, 2] , label='traj_2_z')
+    axs[0].plot(t2, pos_2[:, 2] , label='traj_2_z')
     axs[0].plot(t3, pos_3[0:len3, 2], label='traj_3_z')
     axs[0].scatter(idx_rl * 0.004, pos_1[idx_rl, 2], c='r', marker='o', label='pos')
     axs[0].set_ylabel('pos')
@@ -199,7 +199,7 @@ def pos_interpolation():
     axs[0].legend()
 
     axs[1].plot(t1, vel_1[:, 2], label='vel1_z')
-    axs[1].plot(t2, vel_2[idx_rl2:traj_nums_2, 2], label='vel2_z')
+    axs[1].plot(t2, vel_2[:, 2], label='vel2_z')
     axs[1].plot(t3, vel_3[0:len3, 2], label='vel3_z')
     axs[1].scatter(idx_rl * 0.004, vel_1[idx_rl, 2], c='r', marker='o', label='pos')
     axs[1].set_ylabel('vel')
@@ -207,7 +207,7 @@ def pos_interpolation():
     axs[1].legend()
 
     axs[2].plot(t1, acc_1[:, 2], label='acc1')
-    axs[2].plot(t2, acc_2[idx_rl2:traj_nums_2, 2], label='acc2')
+    axs[2].plot(t2, acc_2[:, 2], label='acc2')
     axs[2].plot(t3, acc_3[0:len3, 2], label='acc3')
     axs[2].scatter(idx_rl * 0.004, acc_1[idx_rl, 2], c='r', marker='o', label='pos')
     axs[2].set_ylabel('acc')
