@@ -14,12 +14,12 @@ def test_orien_plan(ori_rpy1, ori_rpy2, ori_rpy3):
     print("quat3:", quat3)
 
     # 计算四元数之间的角度差
-    angle_diff1, v01 = base.quat_angle_diff_and_axi(quat1, quat2)
-    angle_diff2, v02 = base.quat_angle_diff_and_axi(quat2, quat3)
+    quat1_new, angle_diff1, v01 = base.quat_angle_diff_and_axi_first(quat1, quat2)
+    quat2_new, angle_diff2, v02 = base.quat_angle_diff_and_axi_first(quat2, quat3)
     print("angle_diff1:", angle_diff1)
     print("angle_diff2:", angle_diff2)
     
-    dt = 0.1
+    dt = 0.004
     t_total_1 = 2.0
     t_total_2 = 2.0
     # 时间归一化系数
@@ -45,8 +45,8 @@ def test_orien_plan(ori_rpy1, ori_rpy2, ori_rpy3):
     q1_2[0] = quat1
     for i in range(1, steps_1 + 1):
         t = i * dt * coef1
-        q1_2[i] = base.Slerp_orientation(quat1, quat2, t)
-        angle1[i], v1[i] = base.quat_angle_diff_and_axi(quat1, q1_2[i])
+        q1_2[i] = base.Slerp_orientation(angle_diff1, quat1_new, quat2, t)
+        angle1[i], v1[i] = base.quat_angle_diff_and_axi(quat1, q1_2[i], v01) # 理论上初始轴只是用于第一次
 
     # 计算角速度
     for i in range(1, steps_1):
@@ -57,8 +57,8 @@ def test_orien_plan(ori_rpy1, ori_rpy2, ori_rpy3):
     q2_3 = np.zeros((steps_2 + 1, 4))
     for i in range(1, steps_2 + 1):
         t = i * dt * coef2
-        q2_3[i] = base.Slerp_orientation(quat2, quat3, t)
-        angle2[i], v2[i] = base.quat_angle_diff_and_axi(quat2, q2_3[i])
+        q2_3[i] = base.Slerp_orientation(angle_diff2, quat2_new, quat3, t)
+        angle2[i], v2[i] = base.quat_angle_diff_and_axi(quat2, q2_3[i], v02) # 理论上初始轴只是用于第一次
 
     # 计算角速度
     for i in range(1, steps_2):

@@ -59,7 +59,7 @@ def new_quat(q1, q2):
     q[3] = q1[3] * q2[3] - q1[0] * q2[0] - q1[1] * q2[1] - q1[2] * q2[2]
     return normalize(q)
 
-# 计算两个四元数之间的夹角和旋转轴(弧度制)
+# 计算两个四元数之间的夹角和旋转轴(弧度制, 主要是作为迭代器使用)
 # 输入的四元数必须是单位四元数 q:[x, y, z, w]
 def quat_angle_diff_and_axi(q1, q2, init_axi):
     # 这里求出的theta是四元数空间的夹角，要转到三维空间时需要乘以2
@@ -73,7 +73,7 @@ def quat_angle_diff_and_axi(q1, q2, init_axi):
         q1 = -q1
         cosV = -cosV
     cosV = np.clip(cosV, 0.0, 1.0)  # Ensure the value is within the valid range for arccos
-    radian = np.arccos(cosV)
+    radian = np.arccos(cosV) # radian \in [0, pi/2]
     if np.abs(radian) < 1e-6:
         return 0, init_axi  # 如果两个四元数相同，返回0弧度和初始旋转轴
     
@@ -82,16 +82,14 @@ def quat_angle_diff_and_axi(q1, q2, init_axi):
     # 这里的q1是单位四元数，所以q1^(-1) = q1的共轭
     q1_conjugate = np.array([-q1[0], -q1[1], -q1[2], q1[3]])
     q = new_quat(q1_conjugate, q2)
-    v = q[:3]
+    v = normalize(q[:3])
     return radian, v
 
-# radian: 四元数空间的旋转弧度
-# t_toal: 总时间
-# q1: 起始四元数
-# q2: 结束四元数
-# t: 当前时间 归一化[0,1]
-# 返回插补时刻的四元数
-def Slerp_orientation(q1, q2, t):
+# 计算初始2个四元数之间夹角和旋转轴
+def quat_angle_diff_and_axi_first(q1, q2):
+    # 这里求出的theta是四元数空间的夹角，要转到三维空间时需要乘以2
+    if len(q1) != 4 or len(q2) != 4:
+        raise ValueError("Both q1 and q2 must be of length 4")
     q1 = np.array(q1)
     q2 = np.array(q2)
     cosV = np.dot(q1, q2)
@@ -100,7 +98,25 @@ def Slerp_orientation(q1, q2, t):
         q1 = -q1
         cosV = -cosV
     cosV = np.clip(cosV, 0.0, 1.0)  # Ensure the value is within the valid range for arccos
-    radian = np.arccos(cosV)
+    radian = np.arccos(cosV) # radian \in [0, pi/2]
+    if np.abs(radian) < 1e-6:
+        return 0, np.array([0, 0, 1])  # 如果两个四元数相同，返回0弧度和初始旋转轴
+    
+    # 计算旋转轴v delta_q = q1^(-1) * q2 
+    # q1^(-1) = [-x, -y, -z, w]
+    # 这里的q1是单位四元数，所以q1^(-1) = q1的共轭
+    q1_conjugate = np.array([-q1[0], -q1[1], -q1[2], q1[3]])
+    q = new_quat(q1_conjugate, q2)
+    v = normalize(q[:3])
+    return q1, radian, v
+
+# radian: 四元数空间的旋转弧度
+# t_toal: 总时间
+# q1: 起始四元数
+# q2: 结束四元数
+# t: 当前时间 归一化[0,1]
+# 返回插补时刻的四元数
+def Slerp_orientation(radian, q1, q2, t):
     # 接近0°, slerp退化为线性插值
     if radian - 0 < 1e-2:
         q = (1 - t) * q1 + t * q2
