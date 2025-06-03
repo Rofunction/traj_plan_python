@@ -125,3 +125,16 @@ def cal_angle_vel(q1, q2, dt):
     q2 = np.array(q2)
     angle_diff, v = quat_angle_diff_and_axi(q1, q2)
     return angle_diff / dt
+
+def axis_angle2quat(axis, angle):
+    if len(axis) != 3:
+        raise ValueError("Axis must be of length 3")
+    axis = np.array(axis)
+    axis = normalize(axis)
+    half_angle = angle * 0.5
+    q = np.zeros(4)
+    q[0] = axis[0] * np.sin(half_angle)
+    q[1] = axis[1] * np.sin(half_angle)
+    q[2] = axis[2] * np.sin(half_angle)
+    q[3] = np.cos(half_angle)
+    return q

@@ -294,3 +294,113 @@ def pos_interpolation():
     axs.set_title('3D Trajectory')
     axs.legend()
     plt.show()
+
+# orien: RPY
+def pos_orien_syn(start_pos, end_pos, q1, q2):
+    if len(start_pos) != 3 or len(end_pos) != 3:
+        raise ValueError("Position must be a 3-element vector")
+    # if len(start_orien) != 3 or len(end_orien) != 3:
+    #     raise ValueError("Orientation must be a 3-element vector (RPY in degrees)")
+    
+    dis = base.cal_dis(start_pos, end_pos)
+    if dis <= 0:
+        raise ValueError("Start and end positions must be different")
+    # Convert RPY to quaternion
+    # q1 = base.RPY2quat(start_orien)
+    # q2 = base.RPY2quat(end_orien)
+    # Calculate the distance between the two quaternions: q2 * q1^-1(in world frame)
+    q1, angle_dis, axi = base.quat_angle_diff_and_axi_first(q1, q2)
+
+    p1_2_norm = base.normalize(end_pos - start_pos)
+
+    ruckig = Ruckig(2)
+    input = InputParameter(2)
+    input.max_velocity = [2.5, 1.0]
+    input.max_acceleration = [12.5, 5.0]
+    input.max_jerk = [25, 10.0]
+    input.current_position = [0, 0]
+    input.current_velocity = [0.0, 0.0]
+    input.current_acceleration = [0.0, 0.0]
+    input.target_position = [dis, 2.0 * angle_dis]
+    input.target_velocity = [0.0, 0.0]
+    input.target_acceleration = [0.0, 0.0]
+    traj = Trajectory(2)
+    res = ruckig.calculate(input, traj)
+    if res == Result.ErrorInvalidInput:
+        raise Exception("Invalid input parameters")
+
+    print(f'Trajectory duration: {traj.duration: 0.4f} [s]')
+    traj_time = traj.duration
+    traj_nums = int(traj_time / 0.004) + 1 # +1 to include the end point
+    pos = np.zeros((traj_nums, 3), dtype=float)
+    vel = np.zeros((traj_nums, 3), dtype=float)
+    acc = np.zeros((traj_nums, 3), dtype=float)
+
+    q_imp = np.zeros((traj_nums, 4), dtype=float)
+    angle = np.zeros((traj_nums, 1), dtype=float)
+    omega = np.zeros((traj_nums, 1), dtype=float)
+    d_omega = np.zeros((traj_nums, 1), dtype=float)
+
+    for i in range(traj_nums):
+        pos_temp, vel_temp, acc_temp = traj.at_time(i * 0.004)
+        pos[i, :] = start_pos + p1_2_norm * pos_temp[0]
+        vel[i, :] = vel_temp[0] * p1_2_norm
+        acc[i, :] = acc_temp[0] * p1_2_norm
+        angle[i, 0] = pos_temp[1]
+        omega[i, 0] = vel_temp[1]
+        d_omega[i, 0] = acc_temp[1]
+        # Calculate the quaternion for the current time step
+        q_imp[i, :] = base.new_quat(q1, base.axis_angle2quat(axi, angle[i, 0]))
+    
+    print("end quat", q_imp[-1, :])
+    
+    t = np.arange(traj_nums) * 0.004
+    # plot
+    fig, axs = plt.subplots(3, 1, figsize=(12, 12), sharex=True)
+    axs[0].plot(t, pos[:, 0], label='X Position')
+    axs[0].plot(t, pos[:, 1], label='Y Position')
+    axs[0].plot(t, pos[:, 2], label='Z Position')
+    axs[0].plot(t, angle[:, 0], label='Angle(axis-angle)')
+
+    axs[0].scatter(0, start_pos[0], c='r', marker='o', label='Start X Pos')
+    axs[0].scatter(t[-1], end_pos[0], c='g', marker='o', label='End X Pos')
+    axs[0].scatter(0, start_pos[1], c='r', marker='o', label='Start Y Pos')
+    axs[0].scatter(t[-1], end_pos[1], c='g', marker='o', label='End Y Pos')
+    axs[0].scatter(0, start_pos[2], c='r', marker='o', label='Start Z Pos')
+    axs[0].scatter(t[-1], end_pos[2], c='g', marker='o', label='End Z Pos')
+
+    axs[0].set_ylabel('Position/Angle')
+    axs[0].grid()
+    axs[0].legend(loc='best')
+
+    axs[1].plot(t, vel[:, 0], label='X vel')
+    axs[1].plot(t, vel[:, 1], label='Y vel')
+    axs[1].plot(t, vel[:, 2], label='Z vel')
+    axs[1].plot(t, omega[:, 0], label='Angle_vel(axis-angle)')
+    axs[1].set_ylabel('Vel/Angle_vel')
+    axs[1].grid()
+    axs[1].legend()
+
+    axs[2].plot(t, acc[:, 0], label='X acc')
+    axs[2].plot(t, acc[:, 1], label='Y acc')
+    axs[2].plot(t, acc[:, 2], label='Z acc')
+    axs[2].plot(t, d_omega[:, 0], label='angle_acc(axis-angle)')
+    axs[2].set_ylabel('Acc/Angle_acc')
+    axs[2].grid()
+    axs[2].legend()
+    plt.xlabel('Time [s]')
+    plt.suptitle('Position and Orientation Synchronization')
+    # plt.show()
+
+    # 3D 轨迹
+    fig = plt.figure()
+    axs = fig.add_subplot(111, projection='3d')
+    axs.plot(pos[:, 0], pos[:, 1], pos[:, 2], c='r', label='Trajectory')
+    axs.scatter(start_pos[0], start_pos[1], start_pos[2], c='r', marker='o', label='Start Pos')
+    axs.scatter(end_pos[0], end_pos[1], end_pos[2], c='g', marker='o', label='End Pos')
+    axs.set_xlabel('X')
+    axs.set_ylabel('Y')
+    axs.set_zlabel('Z')
+    axs.set_title('3D Trajectory')
+    axs.legend()
+    plt.show()
