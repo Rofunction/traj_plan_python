@@ -340,6 +340,7 @@ def pos_orien_syn(start_pos, end_pos, q1, q2):
     angle = np.zeros((traj_nums, 1), dtype=float)
     omega = np.zeros((traj_nums, 1), dtype=float)
     d_omega = np.zeros((traj_nums, 1), dtype=float)
+    rpy = np.zeros((traj_nums, 3), dtype=float)
 
     for i in range(traj_nums):
         pos_temp, vel_temp, acc_temp = traj.at_time(i * 0.004)
@@ -351,6 +352,7 @@ def pos_orien_syn(start_pos, end_pos, q1, q2):
         d_omega[i, 0] = acc_temp[1]
         # Calculate the quaternion for the current time step
         q_imp[i, :] = base.new_quat(q1, base.axis_angle2quat(axi, angle[i, 0]))
+        rpy[i, :] = base.quat2RPY(q_imp[i, :])
     
     print("end quat", q_imp[-1, :])
     
@@ -402,5 +404,15 @@ def pos_orien_syn(start_pos, end_pos, q1, q2):
     axs.set_ylabel('Y')
     axs.set_zlabel('Z')
     axs.set_title('3D Trajectory')
+    axs.legend()
+    # plt.show()
+
+
+    fig, axs = plt.subplots(1, 1, figsize=(8, 4), sharex=True)
+    axs.plot(t, rpy[:, 0], label='Roll')
+    axs.plot(t, rpy[:, 1], label='Pitch')
+    axs.plot(t, rpy[:, 2], label='Yaw')
+    axs.set_ylabel('RPY (radians)')
+    axs.grid()
     axs.legend()
     plt.show()
