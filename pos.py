@@ -129,7 +129,7 @@ def pos_interpolation():
 
 
     # 笛卡尔图
-    fig, axs = plt.subplots(3, 1, figsize=(10, 10), sharex=True)
+    fig, axs = plt.subplots(3, 1, figsize=(12, 12), sharex=True)
     t1 = np.arange(traj_nums_1) * 0.004
     t2 = np.arange(traj_nums_2) * 0.004 + t1[idx_rl - idx_rl2]
     t3 = np.arange(traj_nums_1 + idx_2) * 0.004
@@ -161,7 +161,7 @@ def pos_interpolation():
     plt.xlabel('time [s]')
     plt.suptitle('X_label')
     # y 方向对比
-    fig, axs = plt.subplots(3, 1, figsize=(10, 10), sharex=True)
+    fig, axs = plt.subplots(3, 1, figsize=(12, 12), sharex=True)
     axs[0].plot(t1, pos_1[:, 1], label='traj_1_y')
     axs[0].plot(t2, pos_2[:, 1] , label='traj_2_y')
     axs[0].plot(t3, pos_3[0:len3, 1], label='traj_3_y')
