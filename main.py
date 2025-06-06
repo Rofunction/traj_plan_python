@@ -13,7 +13,12 @@ if __name__ == "__main__":
     q1 = np.array([-.495, -.297, -.774, .258])
     q2 = np.array([-.828, -.315, -.177, .429])
     q3 = np.array([.490, -.487, .511, .511])
+    # zone = np.array([0.3, 45.0])
+    zone = np.array([0.2, 30.0])
+    # zone = np.array([0.1, 15.0])
     # orien_plan.test_orien_plan_slerp(q1, q2, q3)
-    # orien_plan.test_orien_plan_doubleS2(q1, q2, q3, 10.0)
-
-    pos.pos_orien_syn(P1, P2, q2, q3)
+    # orien_plan.test_orien_plan_doubleS(q1, q2, q3)
+    # orien_plan.orien_imp_doubleS3(q1, q2, q3, 10.0) # 姿态过渡
+    # pos.pos_orien_syn_no_blending(P1, P2, P3, q1, q2, q3, zone) # 位姿同步无过渡
+    pos.pos_orien_syn_bleding(P1, P2, P3, q1, q2, q3, zone) # 位姿同步blending
+    # pos.pos_interpolation()
